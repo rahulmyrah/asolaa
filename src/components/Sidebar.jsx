@@ -33,57 +33,24 @@ import '../styles/sidebar.css';
 
 const navItems = [
     {
-        section: 'OVERVIEW',
+        section: 'MONITOR',
         items: [
-            { path: '/dashboard', icon: LayoutDashboard, label: 'ASO Dashboard' },
-            { path: '/aso-generator', icon: Hash, label: 'ASO Generator', badge: 'new' },
-            { path: '/app-overview', icon: AppWindow, label: 'App Overview' },
-            { path: '/app-store-performance', icon: TrendingUp, label: 'App Store Performance' },
+            { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
             { path: '/competitors', icon: Users, label: 'Competitors' },
-            { path: '/app-timeline', icon: Clock, label: 'App Timeline' },
-        ],
-    },
-    {
-        section: 'ANALYZE KEYWORDS',
-        items: [
-            { path: '/keyword-research', icon: Hash, label: 'Keyword Research', badge: 'new' },
-            { path: '/keyword-monitoring', icon: MonitorPlay, label: 'Keyword Monitoring', badge: 'new' },
-            { path: '/ranked-keywords', icon: ListOrdered, label: 'All Ranked Keywords', badge: 'new' },
-            { path: '/live-search', icon: Search, label: 'Live Search' },
-        ],
-    },
-    {
-        section: 'ANALYZE MARKET',
-        items: [
-            { path: '/store-visibility', icon: Eye, label: 'Store Visibility', hasSubmenu: true },
-            { path: '/app-downloads', icon: Download, label: 'App Downloads' },
-            { path: '/download-trends', icon: LineChart, label: 'Download Trends', badge: 'upgrade' },
-            { path: '/benchmarks', icon: BarChart3, label: 'Benchmarks', badge: 'upgrade' },
-            { path: '/app-creatives', icon: Image, label: 'App Creatives Library', badge: 'upgrade' },
-        ],
-    },
-    {
-        section: 'OPTIMIZE STORE LISTING',
-        items: [
-            { path: '/aso-score', icon: Target, label: 'ASO Score' },
-            { path: '/store-listing', icon: FileEdit, label: 'Store Listing', hasSubmenu: true },
-            { path: '/changelog', icon: XIcon, label: 'Changelog', badge: 'upgrade' },
-            { path: '/import-export', icon: FileInput, label: 'Import & Export' },
-        ],
-    },
-    {
-        section: 'RATINGS & REVIEWS',
-        items: [
             { path: '/reviews', icon: MessageSquare, label: 'Reviews' },
-            { path: '/reply-reviews', icon: Reply, label: 'Reply to Reviews', badge: 'upgrade' },
-            { path: '/ratings', icon: Star, label: 'Ratings' },
-            { path: '/review-summaries', icon: FileText, label: 'Review Summaries', badge: 'upgrade' },
         ],
     },
     {
-        section: 'MY ADS',
+        section: 'RESEARCH & IDEAS',
         items: [
-            { path: '/ads-manager', icon: Megaphone, label: 'Ads Manager' },
+            { path: '/market-trends', icon: TrendingUp, label: 'Market Trends', badge: 'new' },
+            { path: '/keyword-research', icon: Search, label: 'Keyword Research' },
+        ],
+    },
+    {
+        section: 'OPTIMIZE',
+        items: [
+            { path: '/aso-generator', icon: Hash, label: 'ASO Generator' },
         ],
     },
     {

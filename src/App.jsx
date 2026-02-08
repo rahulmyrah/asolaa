@@ -8,6 +8,7 @@ import Reviews from './pages/Reviews';
 import Settings from './pages/Settings';
 import ASOGenerator from './pages/ASOGenerator';
 import Competitors from './pages/Competitors';
+import MarketTrends from './pages/MarketTrends';
 import Login from './pages/Login';
 import AuthGuard from './components/AuthGuard';
 import { useAppStore } from './store/appStore';
@@ -58,9 +59,9 @@ function App() {
             <MainLayout><Dashboard /></MainLayout>
           </AuthGuard>
         } />
-        <Route path="/app-overview" element={
+        <Route path="/market-trends" element={
           <AuthGuard>
-            <MainLayout><AppOverview /></MainLayout>
+            <MainLayout><MarketTrends /></MainLayout>
           </AuthGuard>
         } />
         <Route path="/keyword-research" element={

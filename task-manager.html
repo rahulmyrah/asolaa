@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASOLAA SEO/GEO Task Board</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #172033;
+      --panel-2: #1f2a40;
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #8b5cf6;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --red: #f43f5e;
+      --blue: #38bdf8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.96);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: 0;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-top: 4px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input, select, textarea, button {
+      font: inherit;
+    }
+
+    input, select, textarea {
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 10px;
+      min-height: 38px;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-height: 38px;
+      padding: 8px 12px;
+      color: var(--text);
+      background: var(--panel-2);
+      cursor: pointer;
+      font-weight: 650;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-color: transparent;
+    }
+
+    button.danger {
+      color: #fecdd3;
+      background: rgba(244, 63, 94, 0.12);
+      border-color: rgba(244, 63, 94, 0.25);
+    }
+
+    main {
+      padding: 18px;
+    }
+
+    .add-form {
+      display: grid;
+      grid-template-columns: 1.3fr 2fr 150px 120px 120px auto;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(280px, 1fr));
+      gap: 14px;
+      min-width: 1450px;
+    }
+
+    .board-wrap {
+      overflow-x: auto;
+      padding-bottom: 14px;
+    }
+
+    .column {
+      background: rgba(23, 32, 51, 0.86);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-height: 64vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .column header {
+      position: static;
+      background: transparent;
+      border-bottom: 1px solid var(--border);
+      padding: 12px;
+    }
+
+    .column-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      font-weight: 800;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .count {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.07);
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+    }
+
+    .cards {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      align-content: start;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: grab;
+    }
+
+    .card:active { cursor: grabbing; }
+
+    .card h3 {
+      margin: 0 0 7px;
+      font-size: 0.94rem;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .card p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag, .priority, .owner {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 7px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 750;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .priority.high { color: #fecdd3; background: rgba(244, 63, 94, 0.13); }
+    .priority.medium { color: #fde68a; background: rgba(245, 158, 11, 0.13); }
+    .priority.low { color: #bbf7d0; background: rgba(16, 185, 129, 0.13); }
+
+    .delete {
+      margin-left: auto;
+      min-height: 28px;
+      padding: 3px 7px;
+      font-size: 0.74rem;
+    }
+
+    .drop-over {
+      outline: 2px solid var(--blue);
+      outline-offset: -4px;
+    }
+
+    @media (max-width: 980px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .add-form {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar,
+      .toolbar input {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>ASOLAA SEO/GEO Strategy Task Board</h1>
+      <div class="sub">Local Trello-style board for the DataForSEO, Neon, LLM, content, social, and backlink rollout.</div>
+    </div>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search tasks..." />
+      <select id="priorityFilter">
+        <option value="">All priorities</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+      <button id="resetBtn" class="danger">Reset Seed Tasks</button>
+    </div>
+  </header>
+
+  <main>
+    <form id="addForm" class="add-form">
+      <input id="title" placeholder="Task title" required />
+      <input id="description" placeholder="Description" />
+      <select id="status">
+        <option value="backlog">Backlog</option>
+        <option value="todo">Todo</option>
+        <option value="in-progress">In Progress</option>
+        <option value="completed">Completed</option>
+        <option value="blocked">Blocked</option>
+      </select>
+      <select id="priority">
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+        <option value="low">Low</option>
+      </select>
+      <input id="owner" placeholder="Owner" value="SEO" />
+      <button class="primary" type="submit">Add Task</button>
+    </form>
+
+    <div class="board-wrap">
+      <section id="board" class="board"></section>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'asolaa-seo-geo-task-board-v1';
+    const columns = [
+      ['backlog', 'Backlog'],
+      ['todo', 'Todo'],
+      ['in-progress', 'In Progress'],
+      ['completed', 'Completed'],
+      ['blocked', 'Blocked'],
+    ];
+
+    const seedTasks = [
+      { id: 'seed-1', title: 'Fix existing build and lint baseline', description: 'Repair Dashboard JSX, imports, auth flow, and lint config before feature work.', status: 'completed', priority: 'high', owner: 'ENG', tags: ['stability'] },
+      { id: 'seed-2', title: 'Add Express SEO/GEO routes', description: 'Create audit, strategy, content brief, publishing queue, and backlink outreach endpoints.', status: 'completed', priority: 'high', owner: 'ENG', tags: ['api'] },
+      { id: 'seed-3', title: 'Wire DataForSEO adapter', description: 'Use server-side Basic Auth for keyword suggestions, SERP competitors, and backlink summaries.', status: 'completed', priority: 'high', owner: 'ENG', tags: ['dataforseo'] },
+      { id: 'seed-4', title: 'Add Neon schema', description: 'Create Postgres tables for projects, audits, strategies, briefs, publishing queue, and outreach drafts.', status: 'completed', priority: 'high', owner: 'ENG', tags: ['neon'] },
+      { id: 'seed-5', title: 'Provision Neon database', description: 'Create internal-team Neon project and add DATABASE_URL to server environment.', status: 'completed', priority: 'high', owner: 'ADMIN', tags: ['external'] },
+      { id: 'seed-6', title: 'Run Neon schema migration', description: 'Apply server/db/schema.sql after DATABASE_URL is available.', status: 'completed', priority: 'high', owner: 'ENG', tags: ['database'] },
+      { id: 'seed-13', title: 'Move authentication to Neon', description: 'Use internal_users table, server password hashing, tokens, and invite-gated registration for the internal team.', status: 'completed', priority: 'high', owner: 'ENG', tags: ['auth'] },
+      { id: 'seed-14', title: 'Create real internal user accounts', description: 'Add the five SEO team members through the Neon-backed signup flow after AUTH_SECRET and DATABASE_URL are configured.', status: 'todo', priority: 'high', owner: 'ADMIN', tags: ['users'] },
+      { id: 'seed-7', title: 'Configure server API keys', description: 'Set DATAFORSEO_LOGIN, DATAFORSEO_PASSWORD, ANTHROPIC_API_KEY, and GEMINI_API_KEY in backend environment.', status: 'blocked', priority: 'high', owner: 'ADMIN', tags: ['secrets'] },
+      { id: 'seed-8', title: 'Verify live audit workflow', description: 'Run URL audit, confirm DataForSEO metrics, strategy generation, content brief, queue, and outreach drafts.', status: 'todo', priority: 'high', owner: 'QA', tags: ['acceptance'] },
+      { id: 'seed-9', title: 'Review social platform API access', description: 'Confirm which owned LinkedIn, X, Facebook, Instagram, WordPress, and Medium integrations are approved.', status: 'backlog', priority: 'medium', owner: 'OPS', tags: ['publishing'] },
+      { id: 'seed-10', title: 'Define backlink outreach approval process', description: 'Create human review rules before sending or submitting any outreach.', status: 'backlog', priority: 'medium', owner: 'SEO', tags: ['backlinks'] },
+      { id: 'seed-11', title: 'Dependency security cleanup', description: 'Address existing npm audit issues from scraper/request dependency chain.', status: 'todo', priority: 'medium', owner: 'ENG', tags: ['security'] },
+      { id: 'seed-12', title: 'Document internal workflow', description: 'Write quick SOP for five-person SEO team: audit, strategy, brief, drafts, outreach review.', status: 'backlog', priority: 'low', owner: 'SEO', tags: ['docs'] },
+    ];
+
+    let tasks = loadTasks();
+
+    function loadTasks() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : seedTasks;
+    }
+
+    function saveTasks() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function render() {
+      const board = document.getElementById('board');
+      const query = document.getElementById('search').value.toLowerCase();
+      const priority = document.getElementById('priorityFilter').value;
+      board.innerHTML = '';
+
+      columns.forEach(([id, label]) => {
+        const columnTasks = tasks.filter(task => {
+          const matchesStatus = task.status === id;
+          const matchesSearch = !query || `${task.title} ${task.description} ${(task.tags || []).join(' ')}`.toLowerCase().includes(query);
+          const matchesPriority = !priority || task.priority === priority;
+          return matchesStatus && matchesSearch && matchesPriority;
+        });
+
+        const column = document.createElement('section');
+        column.className = 'column';
+        column.dataset.status = id;
+        column.innerHTML = `
+          <header><div class="column-title"><span>${label}</span><span class="count">${columnTasks.length}</span></div></header>
+          <div class="cards"></div>
+        `;
+
+        const cards = column.querySelector('.cards');
+        columnTasks.forEach(task => cards.appendChild(createCard(task)));
+        enableDrop(column);
+        board.appendChild(column);
+      });
+    }
+
+    function createCard(task) {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.draggable = true;
+      card.dataset.id = task.id;
+      card.innerHTML = `
+        <h3>${escapeHtml(task.title)}</h3>
+        <p>${escapeHtml(task.description || '')}</p>
+        <div class="meta">
+          <span class="priority ${task.priority}">${task.priority}</span>
+          <span class="owner">${escapeHtml(task.owner || 'TEAM')}</span>
+          ${(task.tags || []).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+          <button class="delete" type="button">Delete</button>
+        </div>
+      `;
+      card.addEventListener('dragstart', event => {
+        event.dataTransfer.setData('text/plain', task.id);
+      });
+      card.querySelector('.delete').addEventListener('click', () => {
+        tasks = tasks.filter(item => item.id !== task.id);
+        saveTasks();
+        render();
+      });
+      return card;
+    }
+
+    function enableDrop(column) {
+      column.addEventListener('dragover', event => {
+        event.preventDefault();
+        column.classList.add('drop-over');
+      });
+      column.addEventListener('dragleave', () => column.classList.remove('drop-over'));
+      column.addEventListener('drop', event => {
+        event.preventDefault();
+        column.classList.remove('drop-over');
+        const id = event.dataTransfer.getData('text/plain');
+        tasks = tasks.map(task => task.id === id ? { ...task, status: column.dataset.status } : task);
+        saveTasks();
+        render();
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    document.getElementById('addForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const task = {
+        id: `task-${Date.now()}`,
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        status: document.getElementById('status').value,
+        priority: document.getElementById('priority').value,
+        owner: document.getElementById('owner').value,
+        tags: ['custom'],
+      };
+      tasks = [task, ...tasks];
+      saveTasks();
+      event.target.reset();
+      document.getElementById('owner').value = 'SEO';
+      render();
+    });
+
+    document.getElementById('search').addEventListener('input', render);
+    document.getElementById('priorityFilter').addEventListener('change', render);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (confirm('Reset board to seeded ASOLAA SEO/GEO tasks?')) {
+        tasks = seedTasks;
+        saveTasks();
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

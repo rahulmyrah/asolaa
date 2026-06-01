@@ -1,38 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Header from '../components/Header';
-import { useAppStore } from '../store/appStore';
+import { apiUrl } from '../services/api';
 import { TrendingUp, Award, DollarSign, Zap, ChevronRight, Loader2, Search } from 'lucide-react';
 import '../styles/dashboard.css';
 
 function MarketTrends() {
-    const { user } = useAppStore();
     const [activeTab, setActiveTab] = useState('free'); // free, paid, grossing
     const [selectedCategory, setSelectedCategory] = useState('FINANCE');
     const [trendingApps, setTrendingApps] = useState([]);
     const [loading, setLoading] = useState(false);
     const [analyzing, setAnalyzing] = useState(false);
     const [aiAnalysis, setAiAnalysis] = useState(null);
-
-    // Initial fetch
-    useEffect(() => {
-        fetchTrends();
-    }, [activeTab, selectedCategory]);
-
-    const fetchTrends = async () => {
-        setLoading(true);
-        setAiAnalysis(null);
-        try {
-            const res = await fetch(`http://localhost:3001/api/appstore/trends?collection=${getCollectionName(activeTab)}&category=${selectedCategory}`);
-            if (res.ok) {
-                const data = await res.json();
-                setTrendingApps(data);
-            }
-        } catch (error) {
-            console.error("Failed to fetch trends", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const getCollectionName = (tab) => {
         switch (tab) {
@@ -43,13 +21,32 @@ function MarketTrends() {
         }
     };
 
+    const fetchTrends = useCallback(async () => {
+        setLoading(true);
+        setAiAnalysis(null);
+        try {
+            const res = await fetch(apiUrl(`/appstore/trends?collection=${getCollectionName(activeTab)}&category=${selectedCategory}`));
+            if (res.ok) {
+                const data = await res.json();
+                setTrendingApps(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch trends", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [activeTab, selectedCategory]);
+
+    // Initial fetch
+    useEffect(() => {
+        fetchTrends();
+    }, [fetchTrends]);
+
     const analyzeTrendsWithAI = async () => {
         setAnalyzing(true);
         try {
             // Simulate AI analysis for now, or call a real endpoint if we have one ready
             // In a real scenario, we'd send the top 10 apps to the /api/ai/analyze-market endpoint
-
-            const topApps = trendingApps.slice(0, 10).map(app => app.title).join(', ');
 
             // Mock response for immediate feedback
             setTimeout(() => {

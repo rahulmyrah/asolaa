@@ -17,7 +17,6 @@ import '../styles/app-overview.css';
 function AppOverview() {
     const { currentApp, keywords, updateApp } = useAppStore();
     const [activeTab, setActiveTab] = useState('metadata');
-    const [editingField, setEditingField] = useState(null);
     const [tempValues, setTempValues] = useState({
         title: currentApp?.title || '',
         subtitle: currentApp?.subtitle || '',
@@ -34,20 +33,12 @@ function AppOverview() {
 
     const handleSave = (field) => {
         updateApp(currentApp.id, { [field]: tempValues[field] });
-        setEditingField(null);
     };
 
     const getCharacterCount = (field) => {
         const maxLengths = { title: 30, subtitle: 30, description: 4000 };
         const current = tempValues[field]?.length || 0;
         return `${current} / ${maxLengths[field]} characters`;
-    };
-
-    const calculateKeywordDensity = (keyword) => {
-        const text = (tempValues.title + ' ' + tempValues.subtitle + ' ' + tempValues.description).toLowerCase();
-        const words = text.split(/\s+/).filter(w => w.length > 0);
-        const count = words.filter(w => w.includes(keyword.toLowerCase())).length;
-        return ((count / words.length) * 100).toFixed(2);
     };
 
     return (

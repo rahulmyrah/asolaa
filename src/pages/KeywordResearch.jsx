@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import { useAppStore } from '../store/appStore';
+import { apiUrl } from '../services/api';
 import {
     Plus,
     Search,
@@ -30,7 +31,7 @@ function KeywordResearch() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:3001/api/ai/keywords/suggest', {
+            const response = await fetch(apiUrl('/ai/keywords/suggest'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

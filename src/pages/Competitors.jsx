@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
-import { useAppStore } from '../store/appStore';
+import { apiUrl } from '../services/api';
 import {
     Plus,
     Search,
@@ -57,7 +57,7 @@ function Competitors() {
         setSearchResults([]); // Clear previous results
 
         try {
-            const res = await fetch(`http://localhost:3001/api/appstore/search?term=${encodeURIComponent(searchTerm)}&num=5`);
+            const res = await fetch(apiUrl(`/appstore/search?term=${encodeURIComponent(searchTerm)}&num=5`));
             if (!res.ok) throw new Error('Search failed');
 
             const data = await res.json();

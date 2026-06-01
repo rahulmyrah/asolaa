@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
+import { apiUrl } from '../services/api';
 import {
     Sparkles,
     Search,
     Loader,
-    CheckCircle,
     AlertCircle,
     Zap,
     Target,
@@ -12,7 +12,6 @@ import {
     Image,
     Calendar,
     Copy,
-    Download,
     ChevronDown,
     ChevronUp,
 } from 'lucide-react';
@@ -84,7 +83,7 @@ function ASOGenerator() {
             }
 
             // Call the deep research API
-            const response = await fetch('http://localhost:3001/api/research/deep', {
+            const response = await fetch(apiUrl('/research/deep'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

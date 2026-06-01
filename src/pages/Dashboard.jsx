@@ -16,16 +16,9 @@ import {
 import { Bar, Line } from 'react-chartjs-2';
 import {
     Info,
-    ChevronDown,
     Star,
-    Reply,
-    CheckCircle,
-    AlertCircle,
-    Globe,
-    Calendar,
     Sparkles,
     TrendingUp,
-    TrendingDown,
     Users,
     Download,
     MessageSquare,
@@ -38,7 +31,7 @@ import '../styles/dashboard.css';
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend);
 
 function Dashboard() {
-    const { currentApp, reviews, ratings, selectedCountry, dateRange, isLoading, history, fetchHistory, user } = useAppStore();
+    const { currentApp, reviews, ratings, isLoading, history, fetchHistory, user } = useAppStore();
     const [performanceTab, setPerformanceTab] = useState('rating'); // 'rating' or 'reviews'
     const [showConnectModal, setShowConnectModal] = useState(false);
 
@@ -56,7 +49,7 @@ function Dashboard() {
         if (user && currentApp?.id) {
             fetchHistory(currentApp.id);
         }
-    }, [currentApp?.id, user]);
+    }, [currentApp?.id, fetchHistory, user]);
 
     // Format history for charts
     const historyLabels = history?.length > 0
@@ -336,15 +329,11 @@ function Dashboard() {
                         </div>
                     </div>
                 </div>
-            </div>
-        </main >
+            </main>
 
-            {/* Connect Modal */ }
-    {
-        showConnectModal && (
-            <ConnectAppModal onClose={() => setShowConnectModal(false)} />
-        )
-    }
+            {showConnectModal && (
+                <ConnectAppModal onClose={() => setShowConnectModal(false)} />
+            )}
         </>
     );
 }

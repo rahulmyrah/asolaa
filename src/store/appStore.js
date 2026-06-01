@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { apiUrl } from '../services/api';
 
 // Sample data for the app
 const sampleApp = {
@@ -133,28 +134,11 @@ export const useAppStore = create(
       // Auth Actions
       setUser: (user) => set({ user, authLoading: false }),
       setAuthLoading: (loading) => set({ authLoading: loading }),
-      logout: () => set({ user: null, apps: [sampleApp], currentApp: sampleApp, history: [] }),
+      logout: () => set({ user: null, authLoading: false, apps: [sampleApp], currentApp: sampleApp, history: [] }),
 
       // Sync User Data
       fetchUserApps: async (userId) => {
-        try {
-          const { getTrackedApps, getTrackedKeywords } = await import('../services/db');
-
-          // Parallel fetch
-          const [apps, dbKeywords] = await Promise.all([
-            getTrackedApps(userId),
-            getTrackedKeywords(userId)
-          ]);
-
-          set((state) => ({
-            apps: apps.length > 0 ? apps : state.apps,
-            currentApp: apps.length > 0 ? apps[0] : state.currentApp,
-            keywords: dbKeywords.length > 0 ? dbKeywords : state.keywords
-          }));
-
-        } catch (error) {
-          console.error('Failed to sync user data', error);
-        }
+        console.info('Neon auth active. App-store tracking sync is local until Neon app data tables are added.', userId);
       },
 
       // Actions - Async Data Fetching
@@ -166,7 +150,7 @@ export const useAppStore = create(
 
           // Allow searching by exact ID if search endpoint supports it, otherwise use 'app' endpoint directly
           // Our backend has /api/appstore/app/:id
-          const res = await fetch(`http://localhost:3001/api/${store}/app/${appId}?country=${country}`);
+          const res = await fetch(apiUrl(`/${store}/app/${appId}?country=${country}`));
           if (!res.ok) throw new Error('Failed to fetch app');
 
           const appData = await res.json();
@@ -195,7 +179,7 @@ export const useAppStore = create(
 
           // Also fetch reviews if possible
           try {
-            const reviewsRes = await fetch(`http://localhost:3001/api/${store}/reviews/${appId}`);
+            const reviewsRes = await fetch(apiUrl(`/${store}/app/${appId}/reviews`));
             if (reviewsRes.ok) {
               const reviewsData = await reviewsRes.json();
               const formattedReviews = reviewsData.slice(0, 50).map((r, i) => ({
@@ -212,24 +196,6 @@ export const useAppStore = create(
             console.warn('Reviews fetch failed', rErr);
           }
 
-          // Snapshot & History (if user logged in)
-          const { user } = get();
-          if (user) {
-            const { addAppSnapshot, getAppHistory } = await import('../services/db');
-
-            // 1. Save Snapshot (Fire & Forget)
-            addAppSnapshot(user.uid, appId, {
-              rating: newApp.rating,
-              reviews: newApp.reviews,
-              version: newApp.version,
-              downloads: newApp.downloads
-            });
-
-            // 2. Fetch History
-            const history = await getAppHistory(user.uid, appId);
-            set({ history });
-          }
-
         } catch (error) {
           console.error('Error fetching app data:', error);
         } finally {
@@ -240,14 +206,7 @@ export const useAppStore = create(
       fetchHistory: async (appId) => {
         const { user } = get();
         if (!user || !appId) return;
-
-        try {
-          const { getAppHistory } = await import('../services/db');
-          const history = await getAppHistory(user.uid, appId);
-          set({ history });
-        } catch (error) {
-          console.error('Failed to fetch history', error);
-        }
+        set({ history: [] });
       },
 
       // Actions - Apps
@@ -268,10 +227,9 @@ export const useAppStore = create(
 
       // Actions - Keywords
       addKeyword: (keyword) => {
-        const { user } = get();
-        set((state) => {
-          // Check if already exists
-          if (state.keywords.some(k => k.keyword === keyword.keyword)) return state;
+          set((state) => {
+            // Check if already exists
+            if (state.keywords.some(k => k.keyword === keyword.keyword)) return state;
 
           const newKeyword = {
             ...keyword,
@@ -280,24 +238,11 @@ export const useAppStore = create(
             change: 0
           };
 
-          // Fire and forget save to DB
-          if (user) {
-            import('../services/db').then(({ addTrackedKeyword }) => {
-              addTrackedKeyword(user.uid, newKeyword);
-            });
-          }
-
           return { keywords: [...state.keywords, newKeyword] };
         });
       },
 
       removeKeyword: (keywordToRemove) => {
-        const { user } = get();
-        if (user) {
-          import('../services/db').then(({ removeTrackedKeyword }) => {
-            removeTrackedKeyword(user.uid, keywordToRemove);
-          });
-        }
         set((state) => ({
           keywords: state.keywords.filter((k) => k.keyword !== keywordToRemove),
         }));

@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: asolaa-seo-geo
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: AUTH_SECRET
+        sync: false
+      - key: INTERNAL_SIGNUP_CODE
+        sync: false
+      - key: DATAFORSEO_LOGIN
+        sync: false
+      - key: DATAFORSEO_PASSWORD
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false

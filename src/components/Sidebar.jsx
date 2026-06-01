@@ -1,31 +1,16 @@
+import { NavLink } from 'react-router-dom';
 import { logoutUser } from '../services/auth';
 import { useAppStore } from '../store/appStore';
 import {
-    Home,
     LayoutDashboard,
-    AppWindow,
+    Globe2,
     TrendingUp,
     Users,
-    Clock,
     Hash,
-    MonitorPlay,
-    ListOrdered,
     Search,
-    LineChart,
-    Download,
-    BarChart3,
-    Image,
-    Target,
     FileEdit,
-    X as XIcon,
-    FileInput,
     MessageSquare,
-    Reply,
-    Star,
-    FileText,
-    Megaphone,
     ChevronRight,
-    Eye,
     LogOut,
     User
 } from 'lucide-react';
@@ -51,6 +36,7 @@ const navItems = [
         section: 'OPTIMIZE',
         items: [
             { path: '/aso-generator', icon: Hash, label: 'ASO Generator' },
+            { path: '/seo-geo', icon: Globe2, label: 'SEO / GEO Strategy', badge: 'new' },
         ],
     },
     {
@@ -62,11 +48,11 @@ const navItems = [
 ];
 
 function Sidebar() {
-    const location = useLocation();
     const { sidebarOpen, user } = useAppStore();
 
     const handleLogout = async () => {
         await logoutUser();
+        window.location.href = '/login';
     };
 
     return (

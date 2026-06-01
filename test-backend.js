@@ -26,7 +26,7 @@ async function testEndpoint(name, url, method = 'GET', body = null) {
             throw new Error(`HTTP ${response.status} - ${response.statusText}`);
         }
 
-        const data = await response.json();
+        await response.json();
         console.log(`${colors.green}✓ Success (${duration}ms)${colors.reset}`);
         return true;
     } catch (error) {

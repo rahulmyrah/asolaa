@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import { useAppStore } from '../store/appStore';
+import { apiUrl } from '../services/api';
 import {
     Plus,
     Search,
@@ -30,7 +31,7 @@ function KeywordResearch() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:3001/api/ai/keywords/suggest', {
+            const response = await fetch(apiUrl('/ai/keywords/suggest'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -101,13 +102,13 @@ function KeywordResearch() {
 
                     {/* Search Section */}
                     <div className="search-container">
-                        <h2 style={{ marginBottom: 16, fontSize: '1.5rem' }}>Find High-Traffic Keywords</h2>
+                        <h2 style={{ marginBottom: 16, fontSize: '1.5rem' }}>Find SEO/GEO Keywords</h2>
                         <form onSubmit={handleSearch} className="search-input-group">
                             <div className="search-input-wrapper">
                                 <Search size={20} />
                                 <input
                                     type="text"
-                                    placeholder="Enter a seed keyword (e.g., 'fitness tracker')..."
+                                    placeholder="Try 'AI app builder for kids' or 'daily panchang app'..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     autoFocus
@@ -197,8 +198,8 @@ function KeywordResearch() {
                     {suggestions.length === 0 && !loading && (
                         <div className="empty-state">
                             <Search size={48} />
-                            <h3>Start Your Research</h3>
-                            <p>Enter a keyword above to find high-potential search terms, difficulty scores, and traffic estimates.</p>
+                            <h3>Start Applaa or Sanathan Research</h3>
+                            <p>Enter a seed keyword to find long-tail terms for content briefs, landing pages, and backlink planning.</p>
                         </div>
                     )}
 

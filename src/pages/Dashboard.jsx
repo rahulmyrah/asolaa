@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
-import ConnectAppModal from '../components/ConnectAppModal';
 import { useAppStore } from '../store/appStore';
 import {
     Chart as ChartJS,
@@ -9,106 +8,55 @@ import {
     BarElement,
     PointElement,
     LineElement,
-    Title,
     Tooltip,
     Legend,
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import {
-    Info,
-    ChevronDown,
-    Star,
-    Reply,
-    CheckCircle,
-    AlertCircle,
-    Globe,
-    Calendar,
-    Sparkles,
-    TrendingUp,
-    TrendingDown,
-    Users,
-    Download,
+    BookOpen,
+    CalendarDays,
+    FileText,
+    Globe2,
+    Hash,
     MessageSquare,
     Search,
+    Sparkles,
+    Star,
+    TrendingUp,
+    Users,
     Zap,
-    Loader2
 } from 'lucide-react';
 import '../styles/dashboard.css';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Tooltip, Legend);
 
 function Dashboard() {
-    const { currentApp, reviews, ratings, selectedCountry, dateRange, isLoading, history, fetchHistory, user } = useAppStore();
-    const [performanceTab, setPerformanceTab] = useState('rating'); // 'rating' or 'reviews'
-    const [showConnectModal, setShowConnectModal] = useState(false);
+    const { currentApp, reviews, history, keywords } = useAppStore();
+    const [performanceTab, setPerformanceTab] = useState('score');
+    const isSanathan = currentApp?.id === 'sanathan';
 
-    // Check for openConnect query param
-    React.useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('openConnect') === 'true') {
-            setShowConnectModal(true);
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }, []);
+    const historyLabels = history.map((item) => new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
 
-    // Fetch history when app changes
-    React.useEffect(() => {
-        if (user && currentApp?.id) {
-            fetchHistory(currentApp.id);
-        }
-    }, [currentApp?.id, user]);
-
-    // Format history for charts
-    const historyLabels = history?.length > 0
-        ? history.map(h => new Date(h.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }))
-        : Array.from({ length: 7 }, (_, i) => {
-            const d = new Date();
-            d.setDate(d.getDate() - (6 - i));
-            return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-        });
-
-    const ratingHistoryData = {
+    const scoreHistoryData = {
         labels: historyLabels,
         datasets: [{
-            label: 'Average Rating',
-            data: history?.length > 0
-                ? history.map(h => h.rating)
-                : Array(7).fill(ratings.average || 0),
-            borderColor: '#00B894',
-            backgroundColor: 'rgba(0, 184, 148, 0.1)',
+            label: 'SEO/GEO Readiness',
+            data: history.map((item) => item.rating),
+            borderColor: '#8B5CF6',
+            backgroundColor: 'rgba(139, 92, 246, 0.12)',
             tension: 0.4,
-            fill: true
-        }]
+            fill: true,
+        }],
     };
 
-    const reviewHistoryData = {
+    const activityData = {
         labels: historyLabels,
         datasets: [{
-            label: 'Total Reviews',
-            data: history?.length > 0
-                ? history.map(h => h.reviews)
-                : Array(7).fill(reviews.length || 0),
-            backgroundColor: '#0984E3',
-            borderRadius: 4
-        }]
-    };
-
-    const ratingDistData = {
-        labels: ['5★', '4★', '3★', '2★', '1★'],
-        datasets: [
-            {
-                data: [
-                    ratings.distribution[5],
-                    ratings.distribution[4],
-                    ratings.distribution[3],
-                    ratings.distribution[2],
-                    ratings.distribution[1],
-                ],
-                backgroundColor: '#00B894',
-                borderRadius: 4,
-                barThickness: 20,
-            },
-        ],
+            label: 'Team Updates',
+            data: history.map((item) => item.reviews),
+            backgroundColor: '#00B894',
+            borderRadius: 4,
+        }],
     };
 
     const chartOptions = {
@@ -117,234 +65,208 @@ function Dashboard() {
         plugins: { legend: { display: false } },
         scales: {
             x: { grid: { display: false } },
-            y: { grid: { color: 'rgba(0,0,0,0.05)' } }
-        }
+            y: { grid: { color: 'rgba(255,255,255,0.06)' } },
+        },
     };
 
-    if (isLoading) {
-        return (
-            <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <Loader2 className="spin" size={48} style={{ color: 'var(--primary-color)', marginBottom: 16 }} />
-                    <h2>Syncing Real-Time Data...</h2>
-                    <p style={{ color: 'var(--text-secondary)' }}>Fetching latest stats from the App Store</p>
-                </div>
-            </div>
-        );
-    }
+    const projectKeywords = keywords.filter((keyword) => keyword.project === currentApp.name).slice(0, 5);
+    const modules = currentApp.mvpModules || currentApp.roadmap.map((item) => ({ title: item, status: 'SEO', detail: currentApp.focus }));
 
     return (
         <>
-            <Header title="Dashboard" />
+            <Header title="Growth Dashboard" />
             <main className="main-content">
                 <div className="page-container">
-                    {/* Welcome Section */}
                     <div className="dashboard-welcome">
-                        <h1>Welcome back, Rahul</h1>
-                        <p>Here's what's happening with <strong>{currentApp?.name || 'your apps'}</strong> today.</p>
+                        <h1>{currentApp.name} Growth Workspace</h1>
+                        <p>{currentApp.focus}</p>
                     </div>
 
-                    {/* Quick Actions */}
                     <div className="quick-actions">
-                        <button className="action-btn" onClick={() => window.location.href = '/aso-generator'}>
+                        <button className="action-btn" onClick={() => window.location.href = '/seo-geo'}>
                             <div className="icon-wrapper gradient">
-                                <Sparkles size={24} />
+                                <Globe2 size={24} />
                             </div>
-                            <span>ASO Generator</span>
+                            <span>Run SEO/GEO Audit</span>
                         </button>
                         <button className="action-btn" onClick={() => window.location.href = '/keyword-research'}>
                             <div className="icon-wrapper gradient" style={{ background: 'linear-gradient(135deg, #00B894 0%, #00CEC9 100%)' }}>
                                 <Search size={24} />
                             </div>
-                            <span>Keyword Research</span>
-                        </button>
-                        <button className="action-btn" onClick={() => window.location.href = '/reviews'}>
-                            <div className="icon-wrapper gradient" style={{ background: 'linear-gradient(135deg, #FF7675 0%, #D63031 100%)' }}>
-                                <MessageSquare size={24} />
-                            </div>
-                            <span>Manage Reviews</span>
+                            <span>Keyword Clusters</span>
                         </button>
                         <button className="action-btn" onClick={() => window.location.href = '/competitors'}>
                             <div className="icon-wrapper gradient" style={{ background: 'linear-gradient(135deg, #FDCB6E 0%, #E17055 100%)' }}>
                                 <Users size={24} />
                             </div>
-                            <span>Competitor Spy</span>
+                            <span>Competitor Links</span>
+                        </button>
+                        <button className="action-btn" onClick={() => window.location.href = '/market-trends'}>
+                            <div className="icon-wrapper gradient" style={{ background: 'linear-gradient(135deg, #FF7675 0%, #D63031 100%)' }}>
+                                <CalendarDays size={24} />
+                            </div>
+                            <span>{isSanathan ? 'MVP Calendar' : 'Content Roadmap'}</span>
                         </button>
                     </div>
 
-                    {/* Connect App Banner */}
                     <div className="connect-banner">
                         <div className="connect-banner-content">
-                            {currentApp?.icon ? (
-                                <img src={currentApp.icon} alt="App Icon" style={{ width: 48, height: 48, borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)' }} />
-                            ) : (
-                                <div className="banner-icon">
-                                    <Zap size={24} />
-                                </div>
-                            )}
+                            <div className="banner-icon">
+                                {isSanathan ? <BookOpen size={24} /> : <Sparkles size={24} />}
+                            </div>
                             <div>
-                                <h3>{currentApp?.bundleId !== 'com.finlaa.aisuite' ? 'App Connected: ' + currentApp.name : 'Connect your app to view real-time data'}</h3>
-                                <p>{currentApp?.bundleId !== 'com.finlaa.aisuite' ? `Tracking real-time performance for ${currentApp.version}` : 'Unlock powerful insights about your app store performance and ASO impact.'}</p>
+                                <h3>{currentApp.title}</h3>
+                                <p>{currentApp.subtitle}</p>
                             </div>
                         </div>
-                        <button className="btn btn-primary" onClick={() => setShowConnectModal(true)}>
-                            {currentApp?.bundleId !== 'com.finlaa.aisuite' ? 'Switch App' : 'Connect App'}
-                        </button>
+                        <a className="btn btn-primary" href={currentApp.website} target="_blank" rel="noreferrer">
+                            Open Website
+                        </a>
                     </div>
 
-                    {/* Charts Grid */}
+                    <div className="dashboard-grid">
+                        <div className="stat-card">
+                            <div className="stat-header">
+                                <span className="stat-title">SEO/GEO Score</span>
+                                <div className="stat-icon"><Star size={20} /></div>
+                            </div>
+                            <div className="stat-value">{currentApp.asoScore}</div>
+                            <div className="stat-change positive"><TrendingUp size={16} /> Current readiness</div>
+                        </div>
+
+                        <div className="stat-card">
+                            <div className="stat-header">
+                                <span className="stat-title">Tracked Keywords</span>
+                                <div className="stat-icon" style={{ color: '#00B894', background: 'rgba(0, 184, 148, 0.1)' }}>
+                                    <Hash size={20} />
+                                </div>
+                            </div>
+                            <div className="stat-value">{currentApp.totalKeywords}</div>
+                            <div className="stat-change positive"><TrendingUp size={16} /> +{currentApp.keywordChange} this sprint</div>
+                        </div>
+
+                        <div className="stat-card">
+                            <div className="stat-header">
+                                <span className="stat-title">{isSanathan ? 'Pro Plan' : 'Launch Stage'}</span>
+                                <div className="stat-icon" style={{ color: '#0984E3', background: 'rgba(9, 132, 227, 0.1)' }}>
+                                    <Zap size={20} />
+                                </div>
+                            </div>
+                            <div className="stat-value" style={{ fontSize: '1.5rem' }}>{currentApp.revenue}</div>
+                            <div className="stat-change neutral">{currentApp.version}</div>
+                        </div>
+
+                        <div className="stat-card">
+                            <div className="stat-header">
+                                <span className="stat-title">Status</span>
+                                <div className="stat-icon" style={{ color: '#E17055', background: 'rgba(225, 112, 85, 0.1)' }}>
+                                    <FileText size={20} />
+                                </div>
+                            </div>
+                            <div className="stat-value" style={{ fontSize: '1.5rem' }}>{currentApp.categoryRank}</div>
+                            <div className="stat-change positive"><TrendingUp size={16} /> {currentApp.downloads}</div>
+                        </div>
+                    </div>
+
                     <div className="charts-grid">
                         <div className="chart-header">
                             <div className="chart-title">
-                                <h3>Performance History</h3>
-                                <p>Track your growth over time</p>
+                                <h3>{isSanathan ? 'MVP Readiness' : 'SEO Readiness'}</h3>
+                                <p>Internal progress signal for this project</p>
                             </div>
                             <div className="chart-actions">
                                 <button
-                                    className={`btn-sm ${performanceTab === 'rating' ? 'active' : ''}`}
-                                    onClick={() => setPerformanceTab('rating')}
-                                    style={{ marginRight: 8, padding: '4px 8px', borderRadius: 4, background: performanceTab === 'rating' ? 'var(--primary-color)' : 'transparent', color: performanceTab === 'rating' ? 'white' : 'inherit', border: '1px solid var(--border-color)' }}
+                                    className={`btn-sm ${performanceTab === 'score' ? 'active' : ''}`}
+                                    onClick={() => setPerformanceTab('score')}
+                                    style={{ marginRight: 8, padding: '4px 8px', borderRadius: 4, background: performanceTab === 'score' ? 'var(--primary-color)' : 'transparent', color: performanceTab === 'score' ? 'white' : 'inherit', border: '1px solid var(--border-color)' }}
                                 >
-                                    Rating
+                                    Score
                                 </button>
                                 <button
-                                    className={`btn-sm ${performanceTab === 'reviews' ? 'active' : ''}`}
-                                    onClick={() => setPerformanceTab('reviews')}
-                                    style={{ padding: '4px 8px', borderRadius: 4, background: performanceTab === 'reviews' ? 'var(--primary-color)' : 'transparent', color: performanceTab === 'reviews' ? 'white' : 'inherit', border: '1px solid var(--border-color)' }}
+                                    className={`btn-sm ${performanceTab === 'updates' ? 'active' : ''}`}
+                                    onClick={() => setPerformanceTab('updates')}
+                                    style={{ padding: '4px 8px', borderRadius: 4, background: performanceTab === 'updates' ? 'var(--primary-color)' : 'transparent', color: performanceTab === 'updates' ? 'white' : 'inherit', border: '1px solid var(--border-color)' }}
                                 >
-                                    Reviews
+                                    Updates
                                 </button>
                             </div>
                         </div>
                         <div className="chart-container" style={{ padding: '0 20px 20px', height: 250 }}>
-                            {performanceTab === 'rating' ? (
-                                <Line data={ratingHistoryData} options={chartOptions} />
-                            ) : (
-                                <Bar data={reviewHistoryData} options={chartOptions} />
-                            )}
+                            {performanceTab === 'score'
+                                ? <Line data={scoreHistoryData} options={chartOptions} />
+                                : <Bar data={activityData} options={chartOptions} />}
                         </div>
                     </div>
 
                     <div className="chart-card">
                         <div className="chart-header">
                             <div className="chart-title">
-                                <h3>Ratings Distribution</h3>
-                                <p>Based on last {ratings.total} ratings</p>
+                                <h3>{isSanathan ? 'Sanathan MVP Modules' : 'Applaa SEO Roadmap'}</h3>
+                                <p>{isSanathan ? 'First-round MVP scope for daily engagement and Pro conversion' : 'Priority content and authority-building work'}</p>
                             </div>
                         </div>
-                        <div className="chart-container" style={{ padding: '0 20px 20px' }}>
-                            <Bar
-                                data={ratingDistData}
-                                options={{
-                                    indexAxis: 'y',
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: { legend: { display: false } },
-                                    scales: { x: { display: false }, y: { grid: { display: false } } }
-                                }}
-                            />
+                        <div style={{ padding: 20, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+                            {modules.map((module) => (
+                                <div key={module.title} className="stat-card" style={{ minHeight: 130 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                                        <h4 style={{ margin: 0 }}>{module.title}</h4>
+                                        <span className="nav-item-badge new">{module.status}</span>
+                                    </div>
+                                    <p style={{ marginTop: 12, color: 'var(--text-secondary)', lineHeight: 1.55 }}>{module.detail}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
                     <div className="chart-card">
                         <div className="chart-header">
                             <div className="chart-title">
-                                <h3>Values & Sentiment</h3>
-                                <p>Latest user feedback highlights</p>
+                                <h3>Priority Keywords</h3>
+                                <p>Seed terms for SEO, GEO, content briefs, and backlink anchor planning</p>
                             </div>
                         </div>
                         <div className="activity-list">
-                            {reviews.length > 0 ? reviews.slice(0, 3).map((review, i) => (
-                                <div key={i} className="activity-item">
-                                    <div className="activity-icon" style={{ background: review.rating >= 4 ? 'rgba(52, 211, 153, 0.1)' : 'rgba(251, 113, 133, 0.1)', color: review.rating >= 4 ? '#34D399' : '#FB7185' }}>
-                                        <Star size={18} fill="currentColor" />
+                            {projectKeywords.map((keyword) => (
+                                <div key={keyword.id} className="activity-item">
+                                    <div className="activity-icon" style={{ background: 'rgba(139, 92, 246, 0.12)', color: '#A78BFA' }}>
+                                        <Search size={18} />
                                     </div>
                                     <div className="activity-content">
-                                        <div className="activity-title">{review.rating}★ from {review.author}</div>
+                                        <div className="activity-title">{keyword.keyword}</div>
                                         <div className="activity-time" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 4 }}>
-                                            "{review.content.substring(0, 40)}{review.content.length > 40 ? '...' : ''}"
+                                            Rank target #{keyword.rank} | +{keyword.change} sprint priority
                                         </div>
                                     </div>
                                 </div>
-                            )) : (
-                                <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)' }}>
-                                    No recent reviews found.
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="chart-card">
+                        <div className="chart-header">
+                            <div className="chart-title">
+                                <h3>Team Notes</h3>
+                                <p>Latest internal planning updates</p>
+                            </div>
+                        </div>
+                        <div className="activity-list">
+                            {reviews.slice(0, 3).map((review) => (
+                                <div key={review.id} className="activity-item">
+                                    <div className="activity-icon" style={{ background: review.replied ? 'rgba(52, 211, 153, 0.1)' : 'rgba(251, 191, 36, 0.1)', color: review.replied ? '#34D399' : '#FBBF24' }}>
+                                        <MessageSquare size={18} />
+                                    </div>
+                                    <div className="activity-content">
+                                        <div className="activity-title">{review.author}</div>
+                                        <div className="activity-time" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 4 }}>
+                                            {review.content}
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
+                            ))}
                         </div>
                     </div>
                 </div>
-
-                {/* Stats Grid */}
-                <div className="dashboard-grid">
-                    {/* Ratings Card */}
-                    <div className="stat-card">
-                        <div className="stat-header">
-                            <span className="stat-title">Average Rating</span>
-                            <div className="stat-icon">
-                                <Star size={20} />
-                            </div>
-                        </div>
-                        <div className="stat-value">{ratings.average.toFixed(1)}</div>
-                        <div className="stat-change positive">
-                            <TrendingUp size={16} />
-                            Based on {ratings.total} ratings
-                        </div>
-                    </div>
-
-                    {/* Reviews Card */}
-                    <div className="stat-card">
-                        <div className="stat-header">
-                            <span className="stat-title">Total Reviews</span>
-                            <div className="stat-icon" style={{ color: '#00B894', background: 'rgba(0, 184, 148, 0.1)' }}>
-                                <MessageSquare size={20} />
-                            </div>
-                        </div>
-                        <div className="stat-value">{reviews.length}</div>
-                        <div className="stat-change positive">
-                            <TrendingUp size={16} />
-                            Latest: {reviews[0]?.date || 'N/A'}
-                        </div>
-                    </div>
-
-                    {/* Visibility Card */}
-                    <div className="stat-card">
-                        <div className="stat-header">
-                            <span className="stat-title">App Version</span>
-                            <div className="stat-icon" style={{ color: '#0984E3', background: 'rgba(9, 132, 227, 0.1)' }}>
-                                <Info size={20} />
-                            </div>
-                        </div>
-                        <div className="stat-value" style={{ fontSize: '1.5rem' }}>{currentApp?.version || 'N/A'}</div>
-                        <div className="stat-change neutral">
-                            Updated: {currentApp?.updated ? new Date(currentApp.updated).toLocaleDateString() : 'Unknown'}
-                        </div>
-                    </div>
-
-                    {/* Downloads Card */}
-                    <div className="stat-card">
-                        <div className="stat-header">
-                            <span className="stat-title">Installs</span>
-                            <div className="stat-icon" style={{ color: '#E17055', background: 'rgba(225, 112, 85, 0.1)' }}>
-                                <Download size={20} />
-                            </div>
-                        </div>
-                        <div className="stat-value">{currentApp?.downloads || 'N/A'}</div>
-                        <div className="stat-change positive">
-                            <TrendingUp size={16} />
-                            est. total
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main >
-
-            {/* Connect Modal */ }
-    {
-        showConnectModal && (
-            <ConnectAppModal onClose={() => setShowConnectModal(false)} />
-        )
-    }
+            </main>
         </>
     );
 }

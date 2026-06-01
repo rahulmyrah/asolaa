@@ -1,31 +1,16 @@
+import { NavLink } from 'react-router-dom';
 import { logoutUser } from '../services/auth';
 import { useAppStore } from '../store/appStore';
 import {
-    Home,
     LayoutDashboard,
-    AppWindow,
+    Globe2,
     TrendingUp,
     Users,
-    Clock,
     Hash,
-    MonitorPlay,
-    ListOrdered,
     Search,
-    LineChart,
-    Download,
-    BarChart3,
-    Image,
-    Target,
     FileEdit,
-    X as XIcon,
-    FileInput,
     MessageSquare,
-    Reply,
-    Star,
-    FileText,
-    Megaphone,
     ChevronRight,
-    Eye,
     LogOut,
     User
 } from 'lucide-react';
@@ -33,57 +18,25 @@ import '../styles/sidebar.css';
 
 const navItems = [
     {
-        section: 'OVERVIEW',
+        section: 'MONITOR',
         items: [
-            { path: '/dashboard', icon: LayoutDashboard, label: 'ASO Dashboard' },
-            { path: '/aso-generator', icon: Hash, label: 'ASO Generator', badge: 'new' },
-            { path: '/app-overview', icon: AppWindow, label: 'App Overview' },
-            { path: '/app-store-performance', icon: TrendingUp, label: 'App Store Performance' },
+            { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
             { path: '/competitors', icon: Users, label: 'Competitors' },
-            { path: '/app-timeline', icon: Clock, label: 'App Timeline' },
+            { path: '/reviews', icon: MessageSquare, label: 'Team Notes' },
         ],
     },
     {
-        section: 'ANALYZE KEYWORDS',
+        section: 'RESEARCH & IDEAS',
         items: [
-            { path: '/keyword-research', icon: Hash, label: 'Keyword Research', badge: 'new' },
-            { path: '/keyword-monitoring', icon: MonitorPlay, label: 'Keyword Monitoring', badge: 'new' },
-            { path: '/ranked-keywords', icon: ListOrdered, label: 'All Ranked Keywords', badge: 'new' },
-            { path: '/live-search', icon: Search, label: 'Live Search' },
+            { path: '/market-trends', icon: TrendingUp, label: 'Growth Plan', badge: 'new' },
+            { path: '/keyword-research', icon: Search, label: 'Keyword Research' },
         ],
     },
     {
-        section: 'ANALYZE MARKET',
+        section: 'OPTIMIZE',
         items: [
-            { path: '/store-visibility', icon: Eye, label: 'Store Visibility', hasSubmenu: true },
-            { path: '/app-downloads', icon: Download, label: 'App Downloads' },
-            { path: '/download-trends', icon: LineChart, label: 'Download Trends', badge: 'upgrade' },
-            { path: '/benchmarks', icon: BarChart3, label: 'Benchmarks', badge: 'upgrade' },
-            { path: '/app-creatives', icon: Image, label: 'App Creatives Library', badge: 'upgrade' },
-        ],
-    },
-    {
-        section: 'OPTIMIZE STORE LISTING',
-        items: [
-            { path: '/aso-score', icon: Target, label: 'ASO Score' },
-            { path: '/store-listing', icon: FileEdit, label: 'Store Listing', hasSubmenu: true },
-            { path: '/changelog', icon: XIcon, label: 'Changelog', badge: 'upgrade' },
-            { path: '/import-export', icon: FileInput, label: 'Import & Export' },
-        ],
-    },
-    {
-        section: 'RATINGS & REVIEWS',
-        items: [
-            { path: '/reviews', icon: MessageSquare, label: 'Reviews' },
-            { path: '/reply-reviews', icon: Reply, label: 'Reply to Reviews', badge: 'upgrade' },
-            { path: '/ratings', icon: Star, label: 'Ratings' },
-            { path: '/review-summaries', icon: FileText, label: 'Review Summaries', badge: 'upgrade' },
-        ],
-    },
-    {
-        section: 'MY ADS',
-        items: [
-            { path: '/ads-manager', icon: Megaphone, label: 'Ads Manager' },
+            { path: '/aso-generator', icon: Hash, label: 'Content Planner' },
+            { path: '/seo-geo', icon: Globe2, label: 'SEO / GEO Strategy', badge: 'new' },
         ],
     },
     {
@@ -95,11 +48,11 @@ const navItems = [
 ];
 
 function Sidebar() {
-    const location = useLocation();
     const { sidebarOpen, user } = useAppStore();
 
     const handleLogout = async () => {
         await logoutUser();
+        window.location.href = '/login';
     };
 
     return (

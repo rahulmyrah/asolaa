@@ -184,4 +184,20 @@ router.get('/suggest', async (req, res) => {
     }
 });
 
+// Get Market Trends (Top Charts)
+router.get('/trends', async (req, res) => {
+    const { collection, category, country } = req.query;
+    try {
+        const results = await store.list({
+            collection: store.collection[collection] || store.collection.TOP_FREE_IOS,
+            category: store.category[category] || store.category.FINANCE,
+            country: country || 'us',
+            num: 20
+        });
+        res.json(results);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;

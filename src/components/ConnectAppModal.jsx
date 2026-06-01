@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 import { useAppStore } from '../store/appStore';
+import { apiUrl } from '../services/api';
 import '../styles/competitors.css'; // Reusing competitor styles for search results
 
 function ConnectAppModal({ onClose }) {
-    const { setCurrentApp, fetchAppDetails, user } = useAppStore();
+    const { setCurrentApp, fetchAppDetails } = useAppStore();
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
@@ -20,8 +21,8 @@ function ConnectAppModal({ onClose }) {
 
         try {
             // Search both stores? For now defaulting to iOS or auto-detect based on term?
-            // Let's search App Store by default for this MVP
-            const res = await fetch(`http://localhost:3001/api/appstore/search?term=${encodeURIComponent(searchTerm)}&num=5`);
+            // Search external app stores only when the team adds a third-party app.
+            const res = await fetch(apiUrl(`/appstore/search?term=${encodeURIComponent(searchTerm)}&num=5`));
             if (!res.ok) throw new Error('Search failed');
 
             const data = await res.json();
@@ -64,18 +65,6 @@ function ConnectAppModal({ onClose }) {
         // Trigger detailed fetch
         fetchAppDetails(app.id);
 
-        // Save to Firestore if user is logged in
-        if (user) {
-            try {
-                // Dynamically import to avoid circular dependencies if any, or just import at top
-                const { addTrackedApp } = await import('../services/db');
-                await addTrackedApp(user.uid, newApp);
-                console.log('App saved to Firestore');
-            } catch (err) {
-                console.error('Failed to save app to Firestore', err);
-            }
-        }
-
         onClose();
     };
 
@@ -90,7 +79,7 @@ function ConnectAppModal({ onClose }) {
                 </div>
                 <div className="modal-body">
                     <p style={{ marginBottom: 20, color: 'var(--text-secondary)' }}>
-                        Search for your app on the App Store to sync real-time data.
+                        Search external app stores only when adding a third-party benchmark.
                     </p>
 
                     <form onSubmit={handleSearch} className="search-input-group">

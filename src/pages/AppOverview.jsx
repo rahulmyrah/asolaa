@@ -17,7 +17,6 @@ import '../styles/app-overview.css';
 function AppOverview() {
     const { currentApp, keywords, updateApp } = useAppStore();
     const [activeTab, setActiveTab] = useState('metadata');
-    const [editingField, setEditingField] = useState(null);
     const [tempValues, setTempValues] = useState({
         title: currentApp?.title || '',
         subtitle: currentApp?.subtitle || '',
@@ -27,27 +26,19 @@ function AppOverview() {
     const tabs = [
         { id: 'metadata', label: 'Metadata' },
         { id: 'creatives', label: 'Creatives' },
-        { id: 'rating-summary', label: 'Rating Summary' },
-        { id: 'category-rankings', label: 'Category Rankings' },
-        { id: 'app-details', label: 'App Details' },
+        { id: 'roadmap', label: 'Roadmap' },
+        { id: 'pricing', label: 'Pricing' },
+        { id: 'project-details', label: 'Project Details' },
     ];
 
     const handleSave = (field) => {
         updateApp(currentApp.id, { [field]: tempValues[field] });
-        setEditingField(null);
     };
 
     const getCharacterCount = (field) => {
         const maxLengths = { title: 30, subtitle: 30, description: 4000 };
         const current = tempValues[field]?.length || 0;
         return `${current} / ${maxLengths[field]} characters`;
-    };
-
-    const calculateKeywordDensity = (keyword) => {
-        const text = (tempValues.title + ' ' + tempValues.subtitle + ' ' + tempValues.description).toLowerCase();
-        const words = text.split(/\s+/).filter(w => w.length > 0);
-        const count = words.filter(w => w.includes(keyword.toLowerCase())).length;
-        return ((count / words.length) * 100).toFixed(2);
     };
 
     return (
@@ -86,11 +77,11 @@ function AppOverview() {
                                     <span className="badge badge-iap">In-App Purchases</span>
                                 )}
                                 <span className="aso-score">
-                                    ASO Score: <strong>{currentApp?.asoScore}</strong>
+                                    SEO/GEO Score: <strong>{currentApp?.asoScore}</strong>
                                 </span>
-                                <a href="#" className="view-store-link">
+                                <a href={currentApp?.website} className="view-store-link" target="_blank" rel="noreferrer">
                                     <ExternalLink size={14} />
-                                    View in App Store
+                                    Open Website
                                 </a>
                             </div>
                         </div>
@@ -100,33 +91,33 @@ function AppOverview() {
                             <div className="stat-card">
                                 <div className="stat-label">
                                     <Download size={14} />
-                                    Downloads
+                                    Launch Status
                                 </div>
                                 <div className="stat-value">{currentApp?.downloads}</div>
-                                <div className="stat-subtitle">Last 30 days · Worldwide</div>
+                                <div className="stat-subtitle">Current internal sprint</div>
                             </div>
 
                             <div className="stat-card">
                                 <div className="stat-label">
                                     <DollarSign size={14} />
-                                    Revenue
+                                    Monetization
                                 </div>
                                 <div className="stat-value">{currentApp?.revenue}</div>
-                                <div className="stat-subtitle">Last 30 days · Worldwide</div>
+                                <div className="stat-subtitle">Current internal sprint</div>
                             </div>
 
                             <div className="stat-card">
                                 <div className="stat-label">
                                     <Star size={14} />
-                                    App Featuring
+                                    Current Focus
                                 </div>
-                                <div className="stat-value empty">No data found.</div>
+                                <div className="stat-value empty">{currentApp?.focus}</div>
                             </div>
 
                             <div className="stat-card highlight">
                                 <div className="stat-label">
                                     <Hash size={14} />
-                                    Total Ranked Keywords
+                                    Tracked Keywords
                                 </div>
                                 <div className="stat-value">
                                     {currentApp?.totalKeywords}
@@ -135,15 +126,15 @@ function AppOverview() {
                                         {currentApp?.keywordChange}
                                     </span>
                                 </div>
-                                <div className="stat-subtitle">Last 30 days · GB</div>
+                                <div className="stat-subtitle">Current SEO sprint</div>
                             </div>
 
                             <div className="stat-card">
                                 <div className="stat-label">
                                     <BarChart2 size={14} />
-                                    Category Rank
+                                    Product Stage
                                 </div>
-                                <div className="stat-value empty">No data found.</div>
+                                <div className="stat-value empty">{currentApp?.categoryRank}</div>
                             </div>
                         </div>
                     </div>
@@ -171,7 +162,7 @@ function AppOverview() {
                                             <label className="field-label">
                                                 Title <Info size={12} />
                                             </label>
-                                            <span className="field-link">Find new keywords with Keyword research</span>
+                                            <span className="field-link">Use Keyword Research for next content clusters</span>
                                         </div>
                                         <input
                                             type="text"
@@ -254,7 +245,7 @@ function AppOverview() {
                         {activeTab !== 'metadata' && (
                             <div className="coming-soon">
                                 <h3>{tabs.find(t => t.id === activeTab)?.label}</h3>
-                                <p>This section is coming soon.</p>
+                                <p>{currentApp?.roadmap?.join(' | ') || 'Project plan is being prepared.'}</p>
                             </div>
                         )}
                     </div>
@@ -265,3 +256,4 @@ function AppOverview() {
 }
 
 export default AppOverview;
+

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
+import { apiUrl } from '../services/api';
 import {
-    Key,
     Save,
     Eye,
     EyeOff,
@@ -14,10 +14,17 @@ import {
 import '../styles/settings.css';
 
 function Settings() {
-    const [settings, setSettings] = useState({
-        geminiApiKey: '',
-        anthropicApiKey: '',
-        firebaseProjectId: '',
+    const [settings, setSettings] = useState(() => {
+        const savedSettings = localStorage.getItem('asolaa_settings');
+        if (savedSettings) {
+            return JSON.parse(savedSettings);
+        }
+
+        return {
+            geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
+            anthropicApiKey: import.meta.env.VITE_ANTHROPIC_API_KEY || '',
+            databaseMode: 'Neon Postgres',
+        };
     });
     const [showKeys, setShowKeys] = useState({
         gemini: false,
@@ -26,21 +33,6 @@ function Settings() {
     const [saved, setSaved] = useState(false);
     const [testing, setTesting] = useState({ gemini: false, anthropic: false });
     const [testResults, setTestResults] = useState({ gemini: null, anthropic: null });
-
-    // Load settings from localStorage or env vars on mount
-    useEffect(() => {
-        const savedSettings = localStorage.getItem('asolaa_settings');
-        if (savedSettings) {
-            setSettings(JSON.parse(savedSettings));
-        } else {
-            // Fallback to env vars
-            setSettings({
-                geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
-                anthropicApiKey: import.meta.env.VITE_ANTHROPIC_API_KEY || '',
-                firebaseProjectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',
-            });
-        }
-    }, []);
 
     const handleSave = () => {
         localStorage.setItem('asolaa_settings', JSON.stringify(settings));
@@ -53,13 +45,13 @@ function Settings() {
         setTestResults(prev => ({ ...prev, [provider]: null }));
 
         try {
-            const response = await fetch('http://localhost:3001/api/health');
+            const response = await fetch(apiUrl('/health'));
             if (response.ok) {
                 setTestResults(prev => ({ ...prev, [provider]: 'success' }));
             } else {
                 setTestResults(prev => ({ ...prev, [provider]: 'error' }));
             }
-        } catch (error) {
+        } catch {
             // For now, just check if key is provided
             const key = provider === 'gemini' ? settings.geminiApiKey : settings.anthropicApiKey;
             if (key && key.length > 10) {
@@ -201,25 +193,25 @@ function Settings() {
                             </a>
                         </div>
 
-                        {/* Firebase Config */}
+                        {/* Neon Config */}
                         <div className="settings-card full-width">
                             <div className="card-header">
-                                <div className="card-icon firebase">
+                                <div className="card-icon neon">
                                     <Database size={24} />
                                 </div>
                                 <div>
-                                    <h3>Firebase Configuration</h3>
-                                    <p>Optional: Connect to Firebase for cloud storage</p>
+                                    <h3>Neon Postgres Backend</h3>
+                                    <p>Internal auth, SEO audits, strategies, content briefs, publishing drafts, and outreach are stored in Neon.</p>
                                 </div>
                             </div>
 
                             <div className="form-group">
-                                <label>Project ID</label>
+                                <label>Database Mode</label>
                                 <input
                                     type="text"
-                                    value={settings.firebaseProjectId}
-                                    onChange={(e) => setSettings({ ...settings, firebaseProjectId: e.target.value })}
-                                    placeholder="your-project-id"
+                                    value={settings.databaseMode || 'Neon Postgres'}
+                                    onChange={(e) => setSettings({ ...settings, databaseMode: e.target.value })}
+                                    placeholder="Neon Postgres"
                                 />
                             </div>
                         </div>
@@ -229,8 +221,8 @@ function Settings() {
                     <div className="security-notice">
                         <Shield size={20} />
                         <div>
-                            <strong>Security Note:</strong> Your API keys are stored locally in your browser's localStorage.
-                            They are never sent to any external server except the official API endpoints.
+                            <strong>Security Note:</strong> Production DataForSEO, LLM, Neon, and auth secrets belong in backend environment variables.
+                            This screen is retained for local development convenience only.
                         </div>
                     </div>
 

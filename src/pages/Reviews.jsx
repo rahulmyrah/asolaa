@@ -74,7 +74,7 @@ function Reviews() {
 
     return (
         <>
-            <Header title="Reviews" />
+            <Header title="Team Notes" />
             <main className="main-content">
                 <div className="page-container">
                     {/* Stats Row */}
@@ -85,7 +85,7 @@ function Reviews() {
                             </div>
                             <div>
                                 <div className="stat-value">{reviews.length}</div>
-                                <div className="stat-label">Total Reviews</div>
+                                <div className="stat-label">Total Notes</div>
                             </div>
                         </div>
                         <div className="stat-card">
@@ -94,7 +94,7 @@ function Reviews() {
                             </div>
                             <div>
                                 <div className="stat-value">{ratings.average.toFixed(1)}</div>
-                                <div className="stat-label">Average Rating</div>
+                                <div className="stat-label">Team Confidence</div>
                             </div>
                         </div>
                         <div className="stat-card">
@@ -103,7 +103,7 @@ function Reviews() {
                             </div>
                             <div>
                                 <div className="stat-value">{reviews.filter((r) => r.replied).length}</div>
-                                <div className="stat-label">Replied</div>
+                                <div className="stat-label">Done</div>
                             </div>
                         </div>
                         <div className="stat-card">
@@ -112,7 +112,7 @@ function Reviews() {
                             </div>
                             <div>
                                 <div className="stat-value">{reviews.filter((r) => !r.replied).length}</div>
-                                <div className="stat-label">Pending Reply</div>
+                                <div className="stat-label">Open</div>
                             </div>
                         </div>
                     </div>
@@ -124,19 +124,19 @@ function Reviews() {
                                 className={`tab ${filter === 'all' ? 'active' : ''}`}
                                 onClick={() => setFilter('all')}
                             >
-                                All Reviews
+                                All Notes
                             </button>
                             <button
                                 className={`tab ${filter === 'pending' ? 'active' : ''}`}
                                 onClick={() => setFilter('pending')}
                             >
-                                Pending Reply
+                                Open
                             </button>
                             <button
                                 className={`tab ${filter === 'replied' ? 'active' : ''}`}
                                 onClick={() => setFilter('replied')}
                             >
-                                Replied
+                                Done
                             </button>
                         </div>
 
@@ -145,7 +145,7 @@ function Reviews() {
                                 <Search size={16} />
                                 <input
                                     type="text"
-                                    placeholder="Search reviews..."
+                                    placeholder="Search team notes..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="search-input"
@@ -153,12 +153,12 @@ function Reviews() {
                             </div>
                             <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
                                 <Plus size={16} />
-                                Add Review
+                                Add Note
                             </button>
                         </div>
                     </div>
 
-                    {/* Reviews List */}
+                    {/* Notes List */}
                     <div className="reviews-grid">
                         {filteredReviews.map((review) => (
                             <div key={review.id} className={`review-card ${review.replied ? 'replied' : ''}`}>
@@ -181,7 +181,7 @@ function Reviews() {
                                             onClick={() => markReviewReplied(review.id)}
                                         >
                                             <Reply size={14} />
-                                            Mark as Replied
+                                            Mark Done
                                         </button>
                                     )}
                                 </div>
@@ -191,8 +191,8 @@ function Reviews() {
                         {filteredReviews.length === 0 && (
                             <div className="no-reviews">
                                 <MessageSquare size={48} />
-                                <h3>No reviews found</h3>
-                                <p>Try adjusting your filters or add a new review.</p>
+                                <h3>No notes found</h3>
+                                <p>Try adjusting your filters or add a new project note.</p>
                             </div>
                         )}
                     </div>
@@ -202,7 +202,7 @@ function Reviews() {
                         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
                             <div className="modal" onClick={(e) => e.stopPropagation()}>
                                 <div className="modal-header">
-                                    <h3>Add New Review</h3>
+                                    <h3>Add Team Note</h3>
                                     <button className="modal-close" onClick={() => setShowAddModal(false)}>
                                         <X size={20} />
                                     </button>
@@ -214,7 +214,7 @@ function Reviews() {
                                             type="text"
                                             value={newReview.author}
                                             onChange={(e) => setNewReview({ ...newReview, author: e.target.value })}
-                                            placeholder="Reviewer name"
+                                            placeholder="Team member name"
                                         />
                                     </div>
                                     <div className="form-group">
@@ -227,11 +227,11 @@ function Reviews() {
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label>Review Content *</label>
+                                        <label>Note Content *</label>
                                         <textarea
                                             value={newReview.content}
                                             onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
-                                            placeholder="Write the review content..."
+                                            placeholder="Write the project note..."
                                             rows={4}
                                         />
                                     </div>
@@ -249,7 +249,7 @@ function Reviews() {
                                         Cancel
                                     </button>
                                     <button className="btn btn-primary" onClick={handleAddReview}>
-                                        Add Review
+                                        Add Note
                                     </button>
                                 </div>
                             </div>

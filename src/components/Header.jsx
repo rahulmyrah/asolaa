@@ -1,14 +1,14 @@
 import React from 'react';
 import { useAppStore } from '../store/appStore';
-import { Bell, HelpCircle, ChevronDown, Menu, CheckCircle, Plus } from 'lucide-react';
+import { Bell, HelpCircle, ChevronDown, Menu, CheckCircle } from 'lucide-react';
 
 function Header({ title }) {
-    const { currentApp, apps, setCurrentApp, fetchAppDetails, toggleSidebar } = useAppStore();
+    const { currentApp, apps, setCurrentApp, toggleSidebar } = useAppStore();
 
     return (
         <>
             <div className="trial-banner">
-                Your trial ends in <strong>5 days</strong>.
+                Internal SEO/GEO workspace for Applaa and Sanathan MVP planning.
             </div>
 
             <header className="header">
@@ -58,8 +58,6 @@ function Header({ title }) {
                                     onClick={() => {
                                         setCurrentApp(app);
                                         document.getElementById('app-dropdown').classList.remove('show');
-                                        // Trigger fetch for new data
-                                        fetchAppDetails(app.id);
                                     }}
                                 >
                                     {app.icon ? (
@@ -71,20 +69,6 @@ function Header({ title }) {
                                     {currentApp?.id === app.id && <CheckCircle size={14} color="var(--primary-color)" style={{ marginLeft: 'auto' }} />}
                                 </div>
                             ))}
-                            <div className="app-dropdown-divider"></div>
-                            <button
-                                className="app-dropdown-action"
-                                onClick={() => {
-                                    // This needs to trigger the modal in Dashboard. 
-                                    // For now, simpler: just navigate to dashboard and open modal via query param or store state?
-                                    // Ideally, move openConnectModal state to store.
-                                    // But quick fix: 
-                                    window.location.href = '/dashboard?openConnect=true';
-                                }}
-                            >
-                                <Plus size={14} />
-                                Add New App
-                            </button>
                         </div>
                     </div>
 

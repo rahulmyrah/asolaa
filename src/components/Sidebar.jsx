@@ -22,20 +22,20 @@ const navItems = [
         items: [
             { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
             { path: '/competitors', icon: Users, label: 'Competitors' },
-            { path: '/reviews', icon: MessageSquare, label: 'Reviews' },
+            { path: '/reviews', icon: MessageSquare, label: 'Team Notes' },
         ],
     },
     {
         section: 'RESEARCH & IDEAS',
         items: [
-            { path: '/market-trends', icon: TrendingUp, label: 'Market Trends', badge: 'new' },
+            { path: '/market-trends', icon: TrendingUp, label: 'Growth Plan', badge: 'new' },
             { path: '/keyword-research', icon: Search, label: 'Keyword Research' },
         ],
     },
     {
         section: 'OPTIMIZE',
         items: [
-            { path: '/aso-generator', icon: Hash, label: 'ASO Generator' },
+            { path: '/aso-generator', icon: Hash, label: 'Content Planner' },
             { path: '/seo-geo', icon: Globe2, label: 'SEO / GEO Strategy', badge: 'new' },
         ],
     },

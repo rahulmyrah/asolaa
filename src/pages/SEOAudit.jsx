@@ -241,7 +241,7 @@ function SEOAudit() {
                                 <input
                                     value={formData.niche}
                                     onChange={(event) => updateForm('niche', event.target.value)}
-                                    placeholder="AI finance calculators"
+                                    placeholder="AI education app for kids or daily panchang app"
                                 />
                             </label>
                             <label>

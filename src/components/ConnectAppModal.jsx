@@ -21,7 +21,7 @@ function ConnectAppModal({ onClose }) {
 
         try {
             // Search both stores? For now defaulting to iOS or auto-detect based on term?
-            // Let's search App Store by default for this MVP
+            // Search external app stores only when the team adds a third-party app.
             const res = await fetch(apiUrl(`/appstore/search?term=${encodeURIComponent(searchTerm)}&num=5`));
             if (!res.ok) throw new Error('Search failed');
 
@@ -79,7 +79,7 @@ function ConnectAppModal({ onClose }) {
                 </div>
                 <div className="modal-body">
                     <p style={{ marginBottom: 20, color: 'var(--text-secondary)' }}>
-                        Search for your app on the App Store to sync real-time data.
+                        Search external app stores only when adding a third-party benchmark.
                     </p>
 
                     <form onSubmit={handleSearch} className="search-input-group">

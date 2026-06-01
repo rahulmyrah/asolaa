@@ -2,11 +2,33 @@ const DATAFORSEO_BASE_URL = 'https://api.dataforseo.com/v3';
 
 const LOCATION_CODES = {
     us: 2840,
+    usa: 2840,
+    'united states': 2840,
+    'united states of america': 2840,
     gb: 2826,
     uk: 2826,
+    'united kingdom': 2826,
+    england: 2826,
     ca: 2124,
+    canada: 2124,
     au: 2036,
+    australia: 2036,
     in: 2356,
+    india: 2356,
+};
+
+const LANGUAGE_CODES = {
+    en: 'en',
+    eng: 'en',
+    english: 'en',
+    hi: 'hi',
+    hindi: 'hi',
+    es: 'es',
+    spanish: 'es',
+    fr: 'fr',
+    french: 'fr',
+    de: 'de',
+    german: 'de',
 };
 
 const hasCredentials = () => Boolean(process.env.DATAFORSEO_LOGIN && process.env.DATAFORSEO_PASSWORD);
@@ -19,6 +41,11 @@ const getAuthHeader = () => {
 const normalizeCountry = (country = 'us') => {
     const key = String(country).trim().toLowerCase();
     return LOCATION_CODES[key] || LOCATION_CODES.us;
+};
+
+const normalizeLanguage = (language = 'en') => {
+    const key = String(language).trim().toLowerCase();
+    return LANGUAGE_CODES[key] || 'en';
 };
 
 const postDataForSeo = async (path, payload) => {
@@ -54,11 +81,26 @@ const postDataForSeo = async (path, payload) => {
     return { ok: true, status: 'ok', data };
 };
 
+const normalizeObjectKeys = (value) => {
+    if (Array.isArray(value)) {
+        return value.map(normalizeObjectKeys);
+    }
+
+    if (value && typeof value === 'object') {
+        return Object.fromEntries(Object.entries(value).map(([key, item]) => [
+            key === '' ? 'unknown' : key,
+            normalizeObjectKeys(item),
+        ]));
+    }
+
+    return value;
+};
+
 export const getKeywordSuggestions = async ({ keyword, country = 'us', language = 'en', limit = 50 }) => {
     const result = await postDataForSeo('/dataforseo_labs/google/keyword_suggestions/live', [{
         keyword,
         location_code: normalizeCountry(country),
-        language_code: language,
+        language_code: normalizeLanguage(language),
         include_seed_keyword: true,
         limit,
     }]);
@@ -83,7 +125,7 @@ export const getSerpCompetitors = async ({ keyword, country = 'us', language = '
     const result = await postDataForSeo('/serp/google/organic/live/advanced', [{
         keyword,
         location_code: normalizeCountry(country),
-        language_code: language,
+        language_code: normalizeLanguage(language),
         depth,
     }]);
 
@@ -114,7 +156,7 @@ export const getBacklinkSummary = async ({ target }) => {
 
     if (!result.ok) return { ...result, summary: null };
 
-    const summary = result.data?.tasks?.[0]?.result?.[0] || null;
+    const summary = normalizeObjectKeys(result.data?.tasks?.[0]?.result?.[0] || null);
     return { ...result, summary };
 };
 
